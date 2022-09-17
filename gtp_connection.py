@@ -298,8 +298,7 @@ class GtpConnection:
         sorted_moves = " ".join(sorted(gtp_moves))
         self.respond("[{}|{}]".format(sorted_moves,sorted_moves.lower()))
         empty = where1d(self.board == EMPTY)
-        print(len(empty))
-        print(len(sorted_moves))
+     
         if len(sorted_moves) == len(empty):
             self.respond("For {}, all empty points are still legal in NoGo rules.".format(self.board.current_player))
         
