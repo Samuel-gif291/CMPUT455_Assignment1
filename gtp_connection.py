@@ -23,7 +23,8 @@ from board_base import (
     PASS,
     MAXSIZE,
     coord_to_point,
-    opponent
+    opponent,
+    where1d
 )
 from board import GoBoard
 from board_util import GoBoardUtil
@@ -286,7 +287,21 @@ class GtpConnection:
 
     def gogui_rules_legal_moves_cmd(self, args):
         """ Implement this function for Assignment 1 """
-        self.respond()
+        color = "b" if self.board.current_player == BLACK else "w"
+        color: GO_COLOR = color_to_int(color)
+        
+        moves: List[GO_POINT] = GoBoardUtil.generate_legal_moves(self.board, color)
+        gtp_moves: List[str] = []
+        for move in moves:
+            coords: Tuple[int, int] = point_to_coord(move, self.board.size)
+            gtp_moves.append(format_point(coords))
+        sorted_moves = " ".join(sorted(gtp_moves))
+        self.respond("[{}|{}]".format(sorted_moves,sorted_moves.lower()))
+        empty = where1d(self.board == EMPTY)
+     
+        if len(sorted_moves) == len(empty):
+            self.respond("For {}, all empty points are still legal in NoGo rules.".format(self.board.current_player))
+        
         return
 
     def play_cmd(self, args: List[str]) -> None:
