@@ -222,7 +222,7 @@ class GoBoard(object):
         opp_block = self._block_of(nb_point)
         if not self._has_liberty(opp_block):
             captures = list(where1d(opp_block))
-            self.board[captures] = EMPTY
+            #self.board[captures] = EMPTY
             if len(captures) == 1:
                 single_capture = nb_point
         return single_capture
@@ -252,7 +252,8 @@ class GoBoard(object):
             if self.board[nb] == opp_color:
                 single_capture = self._detect_and_process_capture(nb)
                 if single_capture != NO_POINT:
-                    single_captures.append(single_capture)
+                    #single_captures.append(single_capture)
+                    return False
         block = self._block_of(point)
         if not self._has_liberty(block):  # undo suicide move
             self.board[point] = EMPTY
