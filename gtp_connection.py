@@ -287,12 +287,12 @@ class GtpConnection:
         color = self.board.current_player
         moves: List[GO_POINT] = GoBoardUtil.generate_legal_moves(self.board, color)
         if len(moves) > 0:
-            self.respond("[unknown]")
+            self.respond("unknown")
         else:
             if opponent(self.board.current_player) == 1:
-                self.respond("[black]")
+                self.respond("black")
             else:
-                self.respond("[white]")
+                self.respond("white")
         return
 
     def gogui_rules_legal_moves_cmd(self, args):
@@ -307,28 +307,34 @@ class GtpConnection:
             gtp_moves.append(format_point(coords))
         sorted_moves = " ".join(sorted(gtp_moves))
         if len(sorted_moves) == 0:
-            self.respond("[]")
+            self.respond("")
             return
-        self.respond("[{}|{}]".format(sorted_moves,sorted_moves.lower()))
+        self.respond(sorted_moves)
+        # self.respond('{}|{}'.format(sorted_moves,sorted_moves.lower()))
         return
 
     def play_cmd(self, args: List[str]) -> None:
         """
         play a move args[1] for given color args[0] in {'b','w'}
         """
+        
         try:
+            
             board_color = args[0].lower()
             board_move = args[1]
+            if board_color != "b" and board_color != "w":
+                self.respond('illegal move: "{}" wrong color'.format(board_color +' '+ board_move))
+                return
             color = color_to_int(board_color)
             if args[1].lower() == "pass":
-                self.respond('#? [illegal Move: "{}" wrong coordinate]'.format(board_color +" "+ board_move))
+                self.respond('illegal move: "{}" wrong coordinate'.format(board_color +" "+ board_move))
                 return
             coord = move_to_coord(args[1], self.board.size)
             move = coord_to_point(coord[0], coord[1], self.board.size)
             is_move_legal, message = self.board.play_move(move,color)
-
+            #if this move is not legal, then it is definitely because it is occupied, all other cases are handled
             if not is_move_legal:
-                self.respond("illegal Move: {}".format('"' + board_color + " " + board_move + '" ' + message))
+                self.respond('illegal move: "{}" {}'.format(board_color + " " + board_move,message))
             else:
                 self.respond()
             return
@@ -341,7 +347,7 @@ class GtpConnection:
         color = color_to_int(board_color)
         moves: List[GO_POINT] = GoBoardUtil.generate_legal_moves(self.board, color)
         if len(moves) == 0:
-            self.respond("[resign]")
+            self.respond("resign")
             return
         random_idx = random.randrange(len(moves))
         move = moves[random_idx]

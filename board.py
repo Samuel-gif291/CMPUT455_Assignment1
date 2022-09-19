@@ -113,7 +113,7 @@ class GoBoard(object):
         if point == PASS:
             return True
         board_copy: GoBoard = self.copy()
-        can_play_move,message = board_copy.play_move(point, color)
+        can_play_move, message = board_copy.play_move(point, color)
         return can_play_move
 
     def end_of_game(self) -> bool:
@@ -229,7 +229,7 @@ class GoBoard(object):
         Returns whether move was legal
         """
         if not self._is_legal_check_simple_cases(point, color):
-            return False, " "
+            return False, "occupied"
         # Special cases
         if point == PASS:
             self.ko_recapture = NO_POINT
