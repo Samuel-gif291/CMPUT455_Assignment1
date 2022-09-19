@@ -113,7 +113,7 @@ class GoBoard(object):
         if point == PASS:
             return True
         board_copy: GoBoard = self.copy()
-        can_play_move = board_copy.play_move(point, color)
+        can_play_move,message = board_copy.play_move(point, color)
         return can_play_move
 
     def end_of_game(self) -> bool:
@@ -229,14 +229,14 @@ class GoBoard(object):
         Returns whether move was legal
         """
         if not self._is_legal_check_simple_cases(point, color):
-            return False
+            return False, " "
         # Special cases
         if point == PASS:
             self.ko_recapture = NO_POINT
             self.current_player = opponent(color)
             self.last2_move = self.last_move
             self.last_move = point
-            return True
+            return True, " "
 
         # General case: deal with captures, suicide, and next ko point
         opp_color = opponent(color)
@@ -250,18 +250,18 @@ class GoBoard(object):
                 if capture_detected:
                     # single_captures.append(single_capture)
                     self.board[point] = EMPTY
-                    return False
+                    return False, "capture"
         block = self._block_of(point)
         if not self._has_liberty(block):  # undo suicide move
             self.board[point] = EMPTY
-            return False
+            return False, "suicide"
         self.ko_recapture = NO_POINT
         if in_enemy_eye and len(single_captures) == 1:
             self.ko_recapture = single_captures[0]
         self.current_player = opponent(color)
         self.last2_move = self.last_move
         self.last_move = point
-        return True
+        return True, ""
 
     def neighbors_of_color(self, point: GO_POINT, color: GO_COLOR) -> List:
         """ List of neighbors of point of given color """

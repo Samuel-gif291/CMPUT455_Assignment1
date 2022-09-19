@@ -13,6 +13,7 @@ import numpy as np
 import re
 from sys import stdin, stdout, stderr
 from typing import Any, Callable, Dict, List, Tuple
+import random
 
 from board_base import (
     BLACK,
@@ -324,14 +325,13 @@ class GtpConnection:
                 return
             coord = move_to_coord(args[1], self.board.size)
             move = coord_to_point(coord[0], coord[1], self.board.size)
-            if not self.board.play_move(move, color):
-                self.respond("Illegal Move: {}".format(board_move))
-                return
+            is_move_legal, message = self.board.play_move(move,color)
+
+            if not is_move_legal:
+                self.respond("illegal Move: {}".format('"' + board_color + " " + board_move + '" ' + message))
             else:
-                self.debug_msg(
-                    "Move: {}\nBoard:\n{}\n".format(board_move, self.board2d())
-                )
-            self.respond()
+                self.respond()
+            return
         except Exception as e:
             self.respond("Error: {}".format(str(e)))
 
@@ -339,14 +339,16 @@ class GtpConnection:
         """ generate a move for color args[0] in {'b','w'} """
         board_color = args[0].lower()
         color = color_to_int(board_color)
-        move = self.go_engine.get_move(self.board, color)
+        moves: List[GO_POINT] = GoBoardUtil.generate_legal_moves(self.board, color)
+        if len(moves) == 0:
+            self.respond("[resign]")
+            return
+        random_idx = random.randrange(len(moves))
+        move = moves[random_idx]
         move_coord = point_to_coord(move, self.board.size)
         move_as_string = format_point(move_coord)
-        if self.board.is_legal(move, color):
-            self.board.play_move(move, color)
-            self.respond(move_as_string)
-        else:
-            self.respond("Illegal move: {}".format(move_as_string))
+        self.respond(move_as_string)
+
 
     """
     ==========================================================================
