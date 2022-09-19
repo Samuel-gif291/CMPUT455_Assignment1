@@ -283,7 +283,16 @@ class GtpConnection:
     """
     def gogui_rules_final_result_cmd(self, args):
         """ Implement this function for Assignment 1 """
-        self.respond("unknown")
+        color = self.board.current_player
+        moves: List[GO_POINT] = GoBoardUtil.generate_legal_moves(self.board, color)
+        if len(moves) > 0:
+            self.respond("[unknown]")
+        else:
+            if opponent(self.board.current_player) == 1:
+                self.respond("[black]")
+            else:
+                self.respond("[white]")
+        return
 
     def gogui_rules_legal_moves_cmd(self, args):
         """ Implement this function for Assignment 1 """
