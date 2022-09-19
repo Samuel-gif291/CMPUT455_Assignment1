@@ -296,8 +296,10 @@ class GtpConnection:
             coords: Tuple[int, int] = point_to_coord(move, self.board.size)
             gtp_moves.append(format_point(coords))
         sorted_moves = " ".join(sorted(gtp_moves))
+        if len(sorted_moves) == 0:
+            self.respond("[]")
+            return
         self.respond("[{}|{}]".format(sorted_moves,sorted_moves.lower()))
-       
         return
 
     def play_cmd(self, args: List[str]) -> None:

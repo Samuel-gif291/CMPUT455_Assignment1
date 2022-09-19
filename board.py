@@ -218,14 +218,10 @@ class GoBoard(object):
         and returns NO_POINT otherwise.
         This result is used in play_move to check for possible ko
         """
-        single_capture: GO_POINT = NO_POINT
         opp_block = self._block_of(nb_point)
         if not self._has_liberty(opp_block):
-            captures = list(where1d(opp_block))
-            #self.board[captures] = EMPTY
-            if len(captures) == 1:
-                single_capture = nb_point
-        return single_capture
+            return True
+        return False
 
     def play_move(self, point: GO_POINT, color: GO_COLOR) -> bool:
         """
@@ -250,9 +246,10 @@ class GoBoard(object):
         neighbors = self._neighbors(point)
         for nb in neighbors:
             if self.board[nb] == opp_color:
-                single_capture = self._detect_and_process_capture(nb)
-                if single_capture != NO_POINT:
-                    #single_captures.append(single_capture)
+                capture_detected = self._detect_and_process_capture(nb)
+                if capture_detected:
+                    # single_captures.append(single_capture)
+                    self.board[point] = EMPTY
                     return False
         block = self._block_of(point)
         if not self._has_liberty(block):  # undo suicide move
